@@ -1,0 +1,147 @@
+<div class="container">
+    <div class="main">
+        <div class="section-heading">
+            <h1>Employee List</h1>
+        </div>
+
+        <div class="listing-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Job Title</th>
+                        <th>Age</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Action
+                            <button class="add-employee-btn custom-pointer"
+                                (click)="isEmployeeEdit = false; activeIndex = -1; openAddEmployeeModal()">
+                                <img src="/assets/icons/add-icon.png" alt="Add Employee">
+                            </button>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th>
+                            <input class="form-control" type="text" placeholder="Search by Name" charater-only
+                                [(ngModel)]="filterModel.name" />
+                        </th>
+                        <th>
+                            <select class="form-control" aria-placeholder="Job Title"
+                                [(ngModel)]="filterModel.jobTitle">
+                                <option disabled *ngIf="!getJobTitles?.length" value="" >No job Present</option>
+                                <option disabled *ngIf="getJobTitles?.length" value="">Select</option>
+                                <option *ngFor="let title of getJobTitles" [value]="title">{{title | titlecase}}
+                                </option>
+                            </select>
+                        </th>
+                        <th>
+                            <input class="form-control" type="number" placeholder="Age" number-only
+                                [(ngModel)]="filterModel.age" />
+                        </th>
+                        <th>
+                            <input class="form-control" type="date" [(ngModel)]="filterModel.startDate"
+                                [max]='todayDate' />
+                        </th>
+                        <th>
+                            <input class="form-control" type="date" [(ngModel)]="filterModel.endDate"
+                                [max]='todayDate' />
+                        </th>
+                        <th class="filter-section">
+                            <button class="add-employee-btn custom-pointer" (click)="filterEmployeeList()">
+                                <img src="/assets/icons/icon-filter.png" alt="Filter Icon">
+                            </button>
+                            <button class="add-employee-btn cancel-btn custom-pointer" (click)="clearFilter()">
+                                <img src="/assets/icons/icon-close.png" alt="Close Icon">
+                            </button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="table-body">
+                    <tr *ngFor="let employee of employeeList | filterListing : filterOption ; let i = index; let li = last; let fi = first"
+                        class="text-center">
+                        <td>{{i + 1}}</td>
+                        <td>{{employee?.firstName}} {{employee?.lastName}}</td>
+                        <td>{{employee?.jobTitle}}</td>
+                        <td>{{employee?.age}}</td>
+                        <td>{{employee?.startDate}}</td>
+                        <td>
+                            <ng-container *ngIf="!employee?.currentlyWorking">
+                                {{employee?.endDate}}
+                            </ng-container>
+                            <ng-container *ngIf="employee?.currentlyWorking">
+                                <span class="working-section">
+                                    Currently Working
+                                </span>
+                            </ng-container>
+                        </td>
+                        <td class="filter-section">
+                            <button class="add-employee-btn custom-pointer" (click)="editEmployeeDetail(employee, i)">
+                                <img src="/assets/icons/icon-view.png" alt="View Icon">
+                            </button>
+                            <button class="add-employee-btn cancel-btn custom-pointer" *ngIf="fi != li"
+                                (click)="removeEmployeeFromList(i)">
+                                <img src="/assets/icons/icon-remove.png" alt="Remove Icon">
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<div id="addEmployeeModal" class="modal">
+    <div class="modal-content">
+        <span class="close" (click)="closeEmployeeModal()">&times;</span>
+        <h2 class="text-center">Add Employee</h2>
+        <div class="add-employee-section">
+            <form class="form-container" [formGroup]="addEmployeeForm">
+
+                <div class="custom-pd-btm">
+
+                    <label>First Name</label>
+                    <input class="form-control" type="text" formControlName="firstName" charater-only />
+
+                    <label class="custom-pd">Last Name</label>
+                    <input class="form-control" type="text" formControlName="lastName" charater-only />
+
+                    <label class="custom-pd">Job Title</label>
+                    <input class="form-control" type="text" formControlName="jobTitle" charater-only />
+
+                </div>
+
+
+                <div class="d-flex">
+                    <label>Age</label>
+                    <input class="form-control" type="number" formControlName="age" number-only />
+
+                    <label class="custom-pd">Start Date</label>
+                    <input class="form-control" type="date" formControlName="startDate" [max]='todayDate' />
+
+                    <div class="end-date-section">
+
+                        <label class="custom-pd">End Date</label>
+                        <input class="form-control" type="date" formControlName="endDate"
+                            [ngClass]="{'disabled': addEmployeeForm.value.currentlyWorking}"
+                            [min]="addEmployeeForm.value.startDate" [max]='todayDate' />
+                        <div class="checkbox-section">
+                            <input type="checkbox" id="working-checkbox" formControlName="currentlyWorking">
+                            <label for="working-checkbox">Currently Working Here ?</label>
+                        </div>
+                    </div>
+                </div>
+
+
+            </form>
+
+            <div class="action-btns">
+                <button class="save-btn custom-pointer" [disabled]="addEmployeeForm.invalid"
+                    (click)="submitEmployeeDetails()">Save</button>
+                <button class="cancel-btn custom-pointer" (click)="closeEmployeeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
